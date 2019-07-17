@@ -110,6 +110,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private TextView statusView;
   private Button flipButton;
   private Button torchButton;
+  private Button cancelButton;
   private View resultView;
   private Result lastResult;
   private boolean hasSurface;
@@ -193,6 +194,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     statusView = (TextView) findViewById(R.id.status_view);
     flipButton = (Button) findViewById(R.id.flip_button);
     torchButton = (Button) findViewById(R.id.torch_button);
+	cancelButton = (Button) findViewById(R.id.cancel_button);
 
     handler = null;
     lastResult = null;
@@ -849,6 +851,25 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
           if (PackageManager.FEATURE_CAMERA_FLASH.equalsIgnoreCase(feature.name)) {
             torchButton.setVisibility(View.VISIBLE);
             torchButton.setOnClickListener(new Button.OnClickListener() {
+              @Override
+              public void onClick(View v) {
+                cameraManager.setTorch(!cameraManager.isTorchOn());
+              }
+            });
+            break;
+          }
+        }
+      }
+    }
+	
+	if (getIntent().getBooleanExtra(Intents.Scan.SHOW_CANCEL_BUTTON, false)) {
+      // only draw the button in case we're using the back camera
+      final int reqCamId = getIntent().getIntExtra(Intents.Scan.CAMERA_ID, OpenCameraInterface.NO_REQUESTED_CAMERA);
+      if (reqCamId != 1) {
+        for (final FeatureInfo feature : this.getPackageManager().getSystemAvailableFeatures()) {
+          if (PackageManager.FEATURE_CAMERA_FLASH.equalsIgnoreCase(feature.name)) {
+            cancelButton.setVisibility(View.VISIBLE);
+            cancelButton.setOnClickListener(new Button.OnClickListener() {
               @Override
               public void onClick(View v) {
                 cameraManager.setTorch(!cameraManager.isTorchOn());
